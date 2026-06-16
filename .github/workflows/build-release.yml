@@ -1,0 +1,81 @@
+name: build-release
+
+# Builds the installable Splunk package and, on a version tag, publishes it as a
+# GitHub Release asset (tarball + SHA-256).
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed to create releases / upload assets on tag builds
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Read app version
+        id: ver
+        run: echo "version=$(cat TA_unifi_ng/VERSION)" >> "$GITHUB_OUTPUT"
+
+      - name: Python syntax check (bin + custom code)
+        run: |
+          python -m compileall -q TA_unifi_ng/bin
+          echo "Python sources compile."
+
+      - name: Build package
+        run: |
+          chmod +x build.sh
+          ./build.sh
+
+      - name: Validate package
+        run: |
+          set -euo pipefail
+          VER="${{ steps.ver.outputs.version }}"
+          TARBALL="dist/TA_unifi_ng-${VER}.tar.gz"
+          test -f "$TARBALL" || { echo "::error::missing $TARBALL"; exit 1; }
+
+          # exactly one top-level directory, named TA_unifi_ng
+          TOP=$(tar -tzf "$TARBALL" | awk -F/ '{print $1}' | sort -u)
+          [ "$TOP" = "TA_unifi_ng" ] || { echo "::error::unexpected top-level: $TOP"; exit 1; }
+
+          # no junk / platform-specific binaries should ship
+          if tar -tzf "$TARBALL" | grep -E '(__pycache__|\.pyc$|\.DS_Store|/local/|-darwin\.so$|\.dylib$)'; then
+            echo "::error::package contains junk or platform-specific files"; exit 1
+          fi
+
+          # checksum matches
+          ( cd dist && shasum -c "TA_unifi_ng-${VER}.tar.gz.sha256" )
+          echo "Package OK: $TARBALL"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TA_unifi_ng-${{ steps.ver.outputs.version }}
+          path: |
+            dist/TA_unifi_ng-${{ steps.ver.outputs.version }}.tar.gz
+            dist/TA_unifi_ng-${{ steps.ver.outputs.version }}.tar.gz.sha256
+          if-no-files-found: error
+
+      - name: Publish release (tag builds only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/TA_unifi_ng-${{ steps.ver.outputs.version }}.tar.gz
+            dist/TA_unifi_ng-${{ steps.ver.outputs.version }}.tar.gz.sha256
+          body_path: docs/release-notes.md
+          generate_release_notes: false
+          fail_on_unmatched_files: true

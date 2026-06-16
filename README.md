@@ -109,6 +109,22 @@ The ready-to-install app is committed under [`TA_unifi_ng/`](TA_unifi_ng/).
 To regenerate with the Splunk UCC generator from the sources in
 [`src/`](src/) (`package/` + `globalConfig.json`), see [`src/README.md`](src/README.md).
 
+### Continuous integration / releases
+
+[`.github/workflows/build-release.yml`](.github/workflows/build-release.yml):
+
+- On every push/PR to `main`: builds the package with `build.sh`, validates it
+  (single top-level dir, no junk/native binaries, Python compiles, checksum
+  matches) and uploads it as a build artifact.
+- On a version tag `v*` (e.g. `v3.3.0`): builds and attaches the tarball +
+  `.sha256` to a GitHub Release, using `docs/release-notes.md` as the body.
+
+Cut a release:
+
+```bash
+git tag v3.3.0 && git push origin v3.3.0
+```
+
 ---
 
 ## Repository layout
