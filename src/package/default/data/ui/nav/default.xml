@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<nav>
+    <view name="unifi_overview" default="true"/>
+    <collection label="Dashboards">
+        <view name="unifi_overview"/>
+        <view name="unifi_device_health"/>
+        <view name="unifi_clients_network"/>
+    </collection>
+    <view name="inputs"/>
+    <view name="configuration"/>
+    <view name="search"/>
+</nav>

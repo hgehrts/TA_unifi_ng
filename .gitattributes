@@ -1,0 +1,12 @@
+# Normalize line endings for text; mark binaries.
+* text=auto eol=lf
+
+*.tar.gz binary
+*.png binary
+*.so binary
+*.json -text=auto
+
+# Treat bundled vendor libs as generated (collapsed in diffs / language stats).
+TA_unifi_ng/lib/** linguist-vendored
+TA_unifi_ng/appserver/static/js/** linguist-generated
+_ref/integration-oas.json linguist-generated

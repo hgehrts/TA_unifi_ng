@@ -1,0 +1,112 @@
+<form version="1.1" theme="dark">
+  <label>UniFi - Device Health</label>
+  <description>Device performance from the UniFi Telemetry input (unifi:device:stats) and inventory state. Requires the Telemetry input to be enabled.</description>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="text" token="idx" searchWhenChanged="true">
+      <label>Index</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="time" token="tr" searchWhenChanged="true">
+      <label>Time range</label>
+      <default>
+        <earliest>-4h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Avg CPU %</title>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:device:stats | stats avg(cpuUtilizationPct) as cpu | eval cpu=round(cpu,1)</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="unit">%</option>
+        <option name="rangeColors">["0x53a051","0xf8be34","0xdc4e41"]</option>
+        <option name="rangeValues">[60,85]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Avg Memory %</title>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:device:stats | stats avg(memoryUtilizationPct) as mem | eval mem=round(mem,1)</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="unit">%</option>
+        <option name="rangeColors">["0x53a051","0xf8be34","0xdc4e41"]</option>
+        <option name="rangeValues">[70,90]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Devices reporting stats</title>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:device:stats | stats dc(unifi_device_id) as d</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>CPU % over time by device</title>
+      <chart>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:device:stats | timechart span=5m avg(cpuUtilizationPct) as cpu by unifi_device_mac</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="charting.chart">line</option>
+        <option name="charting.axisTitleY.text">CPU %</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="height">300</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Top devices by CPU (latest)</title>
+      <table>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:device:stats | stats latest(cpuUtilizationPct) as cpu latest(memoryUtilizationPct) as mem latest(uptimeSec) as uptime by unifi_device_mac | eval uptime_days=round(uptime/86400,1) | sort - cpu | head 20 | fields unifi_device_mac cpu mem uptime_days</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <format type="color" field="cpu">
+          <colorPalette type="list">[#53a051,#f8be34,#dc4e41]</colorPalette>
+          <scale type="threshold">60,85</scale>
+        </format>
+        <format type="color" field="mem">
+          <colorPalette type="list">[#53a051,#f8be34,#dc4e41]</colorPalette>
+          <scale type="threshold">70,90</scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Device inventory &amp; state</title>
+      <table>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:device | stats latest(name) as name latest(model) as model latest(ipAddress) as ip latest(state) as state latest(firmwareVersion) as firmware latest(unifi_site_name) as site by id | fields site name model ip state firmware | sort site name</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="count">25</option>
+      </table>
+    </panel>
+  </row>
+</form>

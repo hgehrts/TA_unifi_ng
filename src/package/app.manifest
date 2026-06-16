@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "2.0.0",
+  "info": {
+    "title": "UniFi Network Add-on for Splunk",
+    "id": {
+      "group": null,
+      "name": "TA_unifi_ng",
+      "version": "2.0.0"
+    },
+    "author": [
+      {
+        "name": "TA UniFi NG",
+        "email": null,
+        "company": null
+      }
+    ],
+    "releaseDate": null,
+    "description": "Polls UniFi Network Integration API v1 (sites, devices, clients, networks) into Splunk.",
+    "classification": {
+      "intendedAudience": "IT Operations",
+      "categories": ["Network"],
+      "developmentStatus": "Production/Stable"
+    },
+    "commonInformationModels": null,
+    "license": {
+      "name": "Apache-2.0",
+      "text": "LICENSE",
+      "uri": null
+    },
+    "privacyPolicy": {
+      "name": null,
+      "text": null,
+      "uri": null
+    },
+    "port": null,
+    "tags": ["unifi", "network", "ubiquiti"]
+  },
+  "dependencies": {},
+  "tasks": [],
+  "inputGroups": {},
+  "incompatibleApps": {},
+  "platformRequirements": {
+    "splunk": {
+      "Enterprise": ">=8.0"
+    }
+  },
+  "supportedDeployments": ["_standalone", "_distributed"],
+  "targetWorkloads": ["_search_heads", "_indexers", "_forwarders"]
+}

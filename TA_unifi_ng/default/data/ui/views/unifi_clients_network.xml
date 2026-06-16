@@ -1,0 +1,129 @@
+<form version="1.1" theme="dark">
+  <label>UniFi - Clients &amp; Network</label>
+  <description>Connected clients, WiFi broadcasts, networks and firewall policies collected by the UniFi Inventory input.</description>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="text" token="idx" searchWhenChanged="true">
+      <label>Index</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="time" token="tr" searchWhenChanged="true">
+      <label>Time range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Unique clients</title>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:client | stats dc(macAddress) as c</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>WiFi broadcasts (SSIDs)</title>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:wifi:broadcast | dedup id | stats count as ssids</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Networks (VLANs)</title>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:network | dedup id | stats count as nets</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Firewall policies</title>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:firewall:policy | dedup id | stats count as pols</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Clients over time</title>
+      <chart>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:client | timechart span=10m dc(macAddress) as clients by type</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="charting.chart">area</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="height">280</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Clients per uplink device</title>
+      <chart>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:client | dedup macAddress | stats dc(macAddress) as clients by uplinkDeviceId | sort - clients | head 10</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Firewall policies by action</title>
+      <chart>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:firewall:policy | dedup id | stats count by action</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>WiFi broadcasts</title>
+      <table>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:wifi:broadcast | stats latest(name) as ssid latest(enabled) as enabled latest(type) as type latest(unifi_site_name) as site by id | fields site ssid type enabled | sort site ssid</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Recently connected clients</title>
+      <table>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:client | stats latest(name) as name latest(ipAddress) as ip latest(type) as type latest(connectedAt) as connected by macAddress | sort - connected | head 25 | fields name macAddress ip type connected</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="count">25</option>
+      </table>
+    </panel>
+  </row>
+</form>

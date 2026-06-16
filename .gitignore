@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# Splunk runtime / local config (never commit secrets or per-instance config)
+local/
+local.meta
+*.unifi_api_key
+.unifi_api_key
+inputs.local.conf
+passwords.conf
+ta_unifi_ng_account.conf
+
+# Build output from ucc-gen (regenerated from src/)
+/output/
+src/output/
+
+# OS / editor cruft
+.DS_Store
+._*
+*.swp
+.idea/
+.vscode/
+
+# Build tarballs are NOT ignored here on purpose: the released dist/ tarball is
+# committed. If you build ad-hoc tarballs elsewhere, keep them out of git.
+/*.tar.gz
+unifi-ta-ng/

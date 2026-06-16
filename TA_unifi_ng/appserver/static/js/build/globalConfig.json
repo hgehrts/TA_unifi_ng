@@ -1,0 +1,864 @@
+{
+  "pages": {
+    "configuration": {
+      "title": "Configuration",
+      "description": "Configure your UniFi Network controller connection",
+      "tabs": [
+        {
+          "name": "account",
+          "title": "Accounts",
+          "restHandlerModule": "TA_unifi_ng_rh_account",
+          "restHandlerClass": "UniFiAccountHandler",
+          "table": {
+            "actions": [
+              "edit",
+              "delete",
+              "clone"
+            ],
+            "header": [
+              {
+                "label": "Name",
+                "field": "name"
+              },
+              {
+                "label": "Controller URL",
+                "field": "controller_url"
+              },
+              {
+                "label": "Verify SSL",
+                "field": "verify_ssl"
+              }
+            ]
+          },
+          "entity": [
+            {
+              "type": "text",
+              "field": "name",
+              "label": "Name",
+              "help": "Unique name for this controller account.",
+              "required": true,
+              "validators": [
+                {
+                  "type": "regex",
+                  "errorMsg": "Name must begin with a letter and consist exclusively of alphanumeric characters and underscores.",
+                  "pattern": "^[a-zA-Z]\\w*$"
+                },
+                {
+                  "type": "string",
+                  "errorMsg": "Length of name should be between 1 and 50 characters.",
+                  "minLength": 1,
+                  "maxLength": 50
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "field": "controller_url",
+              "label": "Controller URL",
+              "help": "UniFi controller address, e.g. 192.168.1.1 or https://192.168.1.1. HTTPS is added automatically if omitted.",
+              "required": true,
+              "validators": [
+                {
+                  "type": "string",
+                  "errorMsg": "Controller URL is required.",
+                  "minLength": 1,
+                  "maxLength": 256
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "field": "api_key",
+              "label": "API Key",
+              "encrypted": true,
+              "help": "UniFi Integration API key (X-API-KEY header). Generate in UniFi Network controller under Settings → Control Plane → Integrations.",
+              "required": true,
+              "validators": [
+                {
+                  "type": "string",
+                  "errorMsg": "API Key is required.",
+                  "minLength": 1,
+                  "maxLength": 256
+                }
+              ]
+            },
+            {
+              "type": "checkbox",
+              "field": "verify_ssl",
+              "label": "Verify SSL Certificate",
+              "help": "Enable to verify the controller TLS certificate. Disable for self-signed certificates (typical for on-premises controllers).",
+              "defaultValue": false
+            }
+          ]
+        },
+        {
+          "name": "logging",
+          "title": "Logging",
+          "entity": [
+            {
+              "type": "singleSelect",
+              "label": "Log level",
+              "options": {
+                "disableSearch": true,
+                "autoCompleteFields": [
+                  {
+                    "value": "DEBUG",
+                    "label": "DEBUG"
+                  },
+                  {
+                    "value": "INFO",
+                    "label": "INFO"
+                  },
+                  {
+                    "value": "WARNING",
+                    "label": "WARNING"
+                  },
+                  {
+                    "value": "ERROR",
+                    "label": "ERROR"
+                  },
+                  {
+                    "value": "CRITICAL",
+                    "label": "CRITICAL"
+                  }
+                ]
+              },
+              "defaultValue": "INFO",
+              "field": "loglevel",
+              "required": true,
+              "validators": [
+                {
+                  "type": "regex",
+                  "errorMsg": "Log level must be one of: DEBUG, INFO, WARNING, ERROR, CRITICAL",
+                  "pattern": "^DEBUG|INFO|WARNING|ERROR|CRITICAL$"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "inputs": {
+      "title": "Inputs",
+      "description": "Manage UniFi data collection inputs. Sites are always collected. Enable additional data types below.",
+      "table": {
+        "actions": [
+          "edit",
+          "delete",
+          "clone"
+        ],
+        "header": [
+          {
+            "label": "Name",
+            "field": "name"
+          },
+          {
+            "label": "Account",
+            "field": "account"
+          },
+          {
+            "label": "Interval",
+            "field": "interval"
+          },
+          {
+            "label": "Index",
+            "field": "index"
+          },
+          {
+            "label": "Status",
+            "field": "disabled"
+          }
+        ],
+        "moreInfo": [
+          {
+            "label": "Name",
+            "field": "name"
+          },
+          {
+            "label": "Account",
+            "field": "account"
+          },
+          {
+            "label": "Interval (s)",
+            "field": "interval"
+          },
+          {
+            "label": "Index",
+            "field": "index"
+          },
+          {
+            "label": "Collect Devices",
+            "field": "collect_devices"
+          },
+          {
+            "label": "Collect Clients",
+            "field": "collect_clients"
+          },
+          {
+            "label": "Collect Networks",
+            "field": "collect_networks"
+          },
+          {
+            "label": "Status",
+            "field": "disabled",
+            "mapping": {
+              "true": "Inactive",
+              "false": "Active"
+            }
+          }
+        ]
+      },
+      "services": [
+        {
+          "name": "unifi_ingest",
+          "title": "UniFi Data Input",
+          "entity": [
+            {
+              "type": "text",
+              "field": "name",
+              "label": "Name",
+              "help": "Unique name for this input.",
+              "required": true,
+              "validators": [
+                {
+                  "type": "regex",
+                  "errorMsg": "Input name must begin with a letter and consist exclusively of alphanumeric characters and underscores.",
+                  "pattern": "^[a-zA-Z]\\w*$"
+                },
+                {
+                  "type": "string",
+                  "errorMsg": "Length of input name should be between 1 and 100 characters.",
+                  "minLength": 1,
+                  "maxLength": 100
+                }
+              ]
+            },
+            {
+              "type": "singleSelect",
+              "field": "account",
+              "label": "Account",
+              "help": "Select the controller account to poll.",
+              "options": {
+                "referenceName": "account"
+              },
+              "required": true
+            },
+            {
+              "type": "text",
+              "field": "interval",
+              "label": "Polling Interval (s)",
+              "validators": [
+                {
+                  "type": "regex",
+                  "errorMsg": "Polling Interval (s) must be either a non-negative number, CRON interval or -1.",
+                  "pattern": "^((?:-1|\\d+(?:\\.\\d+)?)|(([\\*\\d{1,2}\\,\\-\\/]+\\s){4}[\\*\\d{1,2}\\,\\-\\/]+))$"
+                }
+              ],
+              "help": "How often to collect data from the controller, in seconds.",
+              "required": true,
+              "defaultValue": "300"
+            },
+            {
+              "type": "singleSelect",
+              "field": "index",
+              "label": "Index",
+              "defaultValue": "default",
+              "options": {
+                "endpointUrl": "data/indexes?search=isInternal=0+disabled=0",
+                "denyList": "^_.*$",
+                "createSearchChoice": true
+              },
+              "validators": [
+                {
+                  "type": "regex",
+                  "errorMsg": "Index names must begin with a letter or a number and must contain only letters, numbers, underscores or hyphens.",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9\\\\_\\\\-]*$"
+                },
+                {
+                  "type": "string",
+                  "errorMsg": "Length of index name should be between 1 and 80.",
+                  "minLength": 1,
+                  "maxLength": 80
+                }
+              ]
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_devices",
+              "label": "Collect Devices",
+              "help": "Collect device inventory for each site. Sites are always collected.",
+              "defaultValue": true
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_clients",
+              "label": "Collect Clients",
+              "help": "Collect connected client list for each site.",
+              "defaultValue": true
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_networks",
+              "label": "Collect Networks",
+              "help": "Collect network configurations for each site.",
+              "defaultValue": true
+            },
+            {
+              "type": "text",
+              "field": "page_size",
+              "label": "API Page Size",
+              "help": "Number of objects per API page (1–200). Default: 200.",
+              "defaultValue": "200",
+              "validators": [
+                {
+                  "type": "number",
+                  "range": [
+                    1,
+                    200
+                  ],
+                  "isInteger": true,
+                  "errorMsg": "Page size must be an integer between 1 and 200."
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "field": "collection_timeout",
+              "label": "HTTP Timeout (s)",
+              "help": "Timeout for each API request in seconds. Default: 120.",
+              "defaultValue": "120",
+              "validators": [
+                {
+                  "type": "number",
+                  "range": [
+                    10,
+                    3600
+                  ],
+                  "isInteger": true,
+                  "errorMsg": "Timeout must be an integer between 10 and 3600 seconds."
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "field": "site_ids",
+              "label": "Site Filter (optional)",
+              "help": "Comma-separated site UUIDs to collect. Leave empty to collect all sites.",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "unifi_inventory",
+          "title": "UniFi Inventory",
+          "description": "Polls UniFi configuration/inventory lists on one shared interval (default 180s). Toggle individual lists below; each shows its sourcetype.",
+          "entity": [
+            {
+              "type": "text",
+              "field": "name",
+              "label": "Name",
+              "help": "Unique name for this input.",
+              "required": true,
+              "validators": [
+                {
+                  "type": "regex",
+                  "errorMsg": "Input name must begin with a letter and consist exclusively of alphanumeric characters and underscores.",
+                  "pattern": "^[a-zA-Z]\\w*$"
+                },
+                {
+                  "type": "string",
+                  "errorMsg": "Length of input name should be between 1 and 100 characters.",
+                  "minLength": 1,
+                  "maxLength": 100
+                }
+              ]
+            },
+            {
+              "type": "singleSelect",
+              "field": "account",
+              "label": "Account",
+              "help": "Select the controller account to poll.",
+              "options": {
+                "referenceName": "account"
+              },
+              "required": true
+            },
+            {
+              "type": "text",
+              "field": "interval",
+              "label": "Polling Interval (s)",
+              "validators": [
+                {
+                  "type": "regex",
+                  "errorMsg": "Polling Interval (s) must be either a non-negative number, CRON interval or -1.",
+                  "pattern": "^((?:-1|\\d+(?:\\.\\d+)?)|(([\\*\\d{1,2}\\,\\-\\/]+\\s){4}[\\*\\d{1,2}\\,\\-\\/]+))$"
+                }
+              ],
+              "help": "How often to poll configuration/inventory lists, in seconds. Default 180. All inventory lists in this input share this interval.",
+              "required": true,
+              "defaultValue": "180"
+            },
+            {
+              "type": "singleSelect",
+              "field": "index",
+              "label": "Index",
+              "defaultValue": "default",
+              "help": "Send all UniFi data to the same index (recommended).",
+              "options": {
+                "endpointUrl": "data/indexes?search=isInternal=0+disabled=0",
+                "denyList": "^_.*$",
+                "createSearchChoice": true
+              },
+              "validators": [
+                {
+                  "type": "regex",
+                  "errorMsg": "Index names must begin with a letter or a number and must contain only letters, numbers, underscores or hyphens.",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9\\\\_\\\\-]*$"
+                },
+                {
+                  "type": "string",
+                  "errorMsg": "Length of index name should be between 1 and 80.",
+                  "minLength": 1,
+                  "maxLength": 80
+                }
+              ]
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_devices",
+              "label": "Collect Devices (unifi:device)",
+              "help": "Adopted devices per site. Sourcetype: unifi:device. Docs: https://developer.ui.com/network/v10.4.57/getadopteddeviceoverviewpage",
+              "defaultValue": true
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_clients",
+              "label": "Collect Clients (unifi:client)",
+              "help": "Connected clients per site. Sourcetype: unifi:client. Docs: https://developer.ui.com/network/v10.4.57/getconnectedclientoverviewpage",
+              "defaultValue": true
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_networks",
+              "label": "Collect Networks (unifi:network)",
+              "help": "Networks per site. Sourcetype: unifi:network. Docs: https://developer.ui.com/network/v10.4.57/getnetworksoverviewpage",
+              "defaultValue": true
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_device_tags",
+              "label": "Collect Device Tags (unifi:device_tag)",
+              "help": "Device tags per site. Sourcetype: unifi:device_tag. Docs: https://developer.ui.com/network/v10.4.57/getdevicetagpage",
+              "defaultValue": true
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_firewall",
+              "label": "Collect Firewall (unifi:firewall:zone, unifi:firewall:policy, unifi:acl_rule)",
+              "help": "Firewall zones, policies and ACL rules. Sourcetypes: unifi:firewall:zone, unifi:firewall:policy, unifi:acl_rule. Docs: https://developer.ui.com/network/v10.4.57/getfirewallpolicies",
+              "defaultValue": true
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_wifi",
+              "label": "Collect WiFi Broadcasts (unifi:wifi:broadcast)",
+              "help": "WiFi broadcasts (SSIDs). Sourcetype: unifi:wifi:broadcast. Docs: https://developer.ui.com/network/v10.4.57/getwifibroadcastpage",
+              "defaultValue": true
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_wan",
+              "label": "Collect WAN Interfaces (unifi:wan)",
+              "help": "WAN interfaces per site. Sourcetype: unifi:wan. Docs: https://developer.ui.com/network/v10.4.57/getwansoverviewpage",
+              "defaultValue": true
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_pending_devices",
+              "label": "Collect Pending Devices (unifi:device:pending)",
+              "help": "Devices awaiting adoption (controller-wide). Sourcetype: unifi:device:pending. Docs: https://developer.ui.com/network/v10.4.57/getpendingdevicepage",
+              "defaultValue": true
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_info",
+              "label": "Collect Controller Info (unifi:info)",
+              "help": "Controller application version (controller-wide). Sourcetype: unifi:info. Docs: https://developer.ui.com/network/v10.4.57/getinfo",
+              "defaultValue": true
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_vpn",
+              "label": "Collect VPN (unifi:vpn:server, unifi:vpn:tunnel)",
+              "help": "VPN servers and site-to-site tunnels. Sourcetypes: unifi:vpn:server, unifi:vpn:tunnel. Docs: https://developer.ui.com/network/v10.4.57/getvpnserverpage",
+              "defaultValue": false
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_switching",
+              "label": "Collect Switching (unifi:switching:lag, unifi:switching:mc_lag_domain, unifi:switching:switch_stack)",
+              "help": "LAGs, MC-LAG domains and switch stacks. Sourcetypes: unifi:switching:lag, unifi:switching:mc_lag_domain, unifi:switching:switch_stack. Docs: https://developer.ui.com/network/v10.4.57/getlagpage",
+              "defaultValue": false
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_dns",
+              "label": "Collect DNS Policies (unifi:dns:policy)",
+              "help": "DNS policies per site. Sourcetype: unifi:dns:policy. Docs: https://developer.ui.com/network/v10.4.57/getdnspolicypage",
+              "defaultValue": false
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_traffic_lists",
+              "label": "Collect Traffic Matching Lists (unifi:traffic_matching_list)",
+              "help": "Traffic matching lists per site. Sourcetype: unifi:traffic_matching_list. Docs: https://developer.ui.com/network/v10.4.57/gettrafficmatchinglists",
+              "defaultValue": false
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_radius",
+              "label": "Collect RADIUS Profiles (unifi:radius:profile)",
+              "help": "RADIUS profiles per site. Sourcetype: unifi:radius:profile. Docs: https://developer.ui.com/network/v10.4.57/getradiusprofileoverviewpage",
+              "defaultValue": false
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_vouchers",
+              "label": "Collect Hotspot Vouchers (unifi:hotspot:voucher)",
+              "help": "Hotspot vouchers per site. Sourcetype: unifi:hotspot:voucher. Docs: https://developer.ui.com/network/v10.4.57/getvouchers",
+              "defaultValue": false
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_network_detail",
+              "label": "Collect Network Detail (unifi:network:detail, unifi:network:reference)",
+              "help": "Full per-network detail (IPv4/DHCP config, isolation, internet access) and references. 1-2 extra API calls per network. Sourcetypes: unifi:network:detail, unifi:network:reference. Docs: https://developer.ui.com/network/v10.4.57/getnetworkdetails",
+              "defaultValue": false
+            },
+            {
+              "type": "text",
+              "field": "page_size",
+              "label": "API Page Size",
+              "help": "Number of objects per API page (1–200). Default: 200.",
+              "defaultValue": "200",
+              "validators": [
+                {
+                  "type": "number",
+                  "range": [
+                    1,
+                    200
+                  ],
+                  "isInteger": true,
+                  "errorMsg": "Page size must be an integer between 1 and 200."
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "field": "collection_timeout",
+              "label": "HTTP Timeout (s)",
+              "help": "Timeout for each API request in seconds. Default: 120.",
+              "defaultValue": "120",
+              "validators": [
+                {
+                  "type": "number",
+                  "range": [
+                    10,
+                    3600
+                  ],
+                  "isInteger": true,
+                  "errorMsg": "Timeout must be an integer between 10 and 3600."
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "field": "site_ids",
+              "label": "Site Filter (optional)",
+              "help": "Comma-separated site UUIDs. Leave empty to auto-discover and collect all sites."
+            }
+          ]
+        },
+        {
+          "name": "unifi_telemetry",
+          "title": "UniFi Telemetry",
+          "description": "Polls per-device performance statistics and detail on one shared interval (default 60s). One API call per device per enabled collector — raise the interval on large fleets.",
+          "entity": [
+            {
+              "type": "text",
+              "field": "name",
+              "label": "Name",
+              "help": "Unique name for this input.",
+              "required": true,
+              "validators": [
+                {
+                  "type": "regex",
+                  "errorMsg": "Input name must begin with a letter and consist exclusively of alphanumeric characters and underscores.",
+                  "pattern": "^[a-zA-Z]\\w*$"
+                },
+                {
+                  "type": "string",
+                  "errorMsg": "Length of input name should be between 1 and 100 characters.",
+                  "minLength": 1,
+                  "maxLength": 100
+                }
+              ]
+            },
+            {
+              "type": "singleSelect",
+              "field": "account",
+              "label": "Account",
+              "help": "Select the controller account to poll.",
+              "options": {
+                "referenceName": "account"
+              },
+              "required": true
+            },
+            {
+              "type": "text",
+              "field": "interval",
+              "label": "Polling Interval (s)",
+              "validators": [
+                {
+                  "type": "regex",
+                  "errorMsg": "Polling Interval (s) must be either a non-negative number, CRON interval or -1.",
+                  "pattern": "^((?:-1|\\d+(?:\\.\\d+)?)|(([\\*\\d{1,2}\\,\\-\\/]+\\s){4}[\\*\\d{1,2}\\,\\-\\/]+))$"
+                }
+              ],
+              "help": "How often to poll per-device telemetry, in seconds. One API call per device per enabled collector. Default 60. Raise this on large fleets to reduce request rate.",
+              "required": true,
+              "defaultValue": "60"
+            },
+            {
+              "type": "singleSelect",
+              "field": "index",
+              "label": "Index",
+              "defaultValue": "default",
+              "help": "Send all UniFi data to the same index (recommended).",
+              "options": {
+                "endpointUrl": "data/indexes?search=isInternal=0+disabled=0",
+                "denyList": "^_.*$",
+                "createSearchChoice": true
+              },
+              "validators": [
+                {
+                  "type": "regex",
+                  "errorMsg": "Index names must begin with a letter or a number and must contain only letters, numbers, underscores or hyphens.",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9\\\\_\\\\-]*$"
+                },
+                {
+                  "type": "string",
+                  "errorMsg": "Length of index name should be between 1 and 80.",
+                  "minLength": 1,
+                  "maxLength": 80
+                }
+              ]
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_device_stats",
+              "label": "Collect Device Statistics (unifi:device:stats)",
+              "help": "Per-device CPU, memory, load average, uptime and uplink rates. One API call per device. Sourcetype: unifi:device:stats. Docs: https://developer.ui.com/network/v10.4.57/getadopteddevicelateststatistics",
+              "defaultValue": true
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_device_detail",
+              "label": "Collect Device Detail (unifi:device:detail)",
+              "help": "Full per-device record: ports (PoE/speed/state), radios, uplink, provisionedAt. One API call per device. Sourcetype: unifi:device:detail. Docs: https://developer.ui.com/network/v10.4.57/getadopteddevicedetails",
+              "defaultValue": true
+            },
+            {
+              "type": "text",
+              "field": "page_size",
+              "label": "API Page Size",
+              "help": "Number of objects per API page (1–200). Default: 200.",
+              "defaultValue": "200",
+              "validators": [
+                {
+                  "type": "number",
+                  "range": [
+                    1,
+                    200
+                  ],
+                  "isInteger": true,
+                  "errorMsg": "Page size must be an integer between 1 and 200."
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "field": "collection_timeout",
+              "label": "HTTP Timeout (s)",
+              "help": "Timeout for each API request in seconds. Default: 120.",
+              "defaultValue": "120",
+              "validators": [
+                {
+                  "type": "number",
+                  "range": [
+                    10,
+                    3600
+                  ],
+                  "isInteger": true,
+                  "errorMsg": "Timeout must be an integer between 10 and 3600."
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "field": "site_ids",
+              "label": "Site Filter (optional)",
+              "help": "Comma-separated site UUIDs. Leave empty to auto-discover and collect all sites."
+            }
+          ]
+        },
+        {
+          "name": "unifi_reference",
+          "title": "UniFi Reference",
+          "description": "Polls large near-static reference data (countries, DPI applications/categories) on one shared interval (default 86400s = daily).",
+          "entity": [
+            {
+              "type": "text",
+              "field": "name",
+              "label": "Name",
+              "help": "Unique name for this input.",
+              "required": true,
+              "validators": [
+                {
+                  "type": "regex",
+                  "errorMsg": "Input name must begin with a letter and consist exclusively of alphanumeric characters and underscores.",
+                  "pattern": "^[a-zA-Z]\\w*$"
+                },
+                {
+                  "type": "string",
+                  "errorMsg": "Length of input name should be between 1 and 100 characters.",
+                  "minLength": 1,
+                  "maxLength": 100
+                }
+              ]
+            },
+            {
+              "type": "singleSelect",
+              "field": "account",
+              "label": "Account",
+              "help": "Select the controller account to poll.",
+              "options": {
+                "referenceName": "account"
+              },
+              "required": true
+            },
+            {
+              "type": "text",
+              "field": "interval",
+              "label": "Polling Interval (s)",
+              "validators": [
+                {
+                  "type": "regex",
+                  "errorMsg": "Polling Interval (s) must be either a non-negative number, CRON interval or -1.",
+                  "pattern": "^((?:-1|\\d+(?:\\.\\d+)?)|(([\\*\\d{1,2}\\,\\-\\/]+\\s){4}[\\*\\d{1,2}\\,\\-\\/]+))$"
+                }
+              ],
+              "help": "How often to refresh static reference data, in seconds. Default 86400 (daily). These lists rarely change.",
+              "required": true,
+              "defaultValue": "86400"
+            },
+            {
+              "type": "singleSelect",
+              "field": "index",
+              "label": "Index",
+              "defaultValue": "default",
+              "help": "Send all UniFi data to the same index (recommended).",
+              "options": {
+                "endpointUrl": "data/indexes?search=isInternal=0+disabled=0",
+                "denyList": "^_.*$",
+                "createSearchChoice": true
+              },
+              "validators": [
+                {
+                  "type": "regex",
+                  "errorMsg": "Index names must begin with a letter or a number and must contain only letters, numbers, underscores or hyphens.",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9\\\\_\\\\-]*$"
+                },
+                {
+                  "type": "string",
+                  "errorMsg": "Length of index name should be between 1 and 80.",
+                  "minLength": 1,
+                  "maxLength": 80
+                }
+              ]
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_countries",
+              "label": "Collect Countries (unifi:ref:country)",
+              "help": "Country code reference list (~248 rows). Sourcetype: unifi:ref:country. Docs: https://developer.ui.com/network/v10.4.57/getcountries",
+              "defaultValue": true
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_dpi_applications",
+              "label": "Collect DPI Applications (unifi:ref:dpi_application)",
+              "help": "Deep Packet Inspection application reference list (~2100 rows). Sourcetype: unifi:ref:dpi_application. Docs: https://developer.ui.com/network/v10.4.57/getdpiapplications",
+              "defaultValue": true
+            },
+            {
+              "type": "checkbox",
+              "field": "collect_dpi_categories",
+              "label": "Collect DPI Categories (unifi:ref:dpi_category)",
+              "help": "DPI application category reference list (~35 rows). Sourcetype: unifi:ref:dpi_category. Docs: https://developer.ui.com/network/v10.4.57/getdpiapplicationcategories",
+              "defaultValue": true
+            },
+            {
+              "type": "text",
+              "field": "page_size",
+              "label": "API Page Size",
+              "help": "Number of objects per API page (1–200). Default: 200.",
+              "defaultValue": "200",
+              "validators": [
+                {
+                  "type": "number",
+                  "range": [
+                    1,
+                    200
+                  ],
+                  "isInteger": true,
+                  "errorMsg": "Page size must be an integer between 1 and 200."
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "field": "collection_timeout",
+              "label": "HTTP Timeout (s)",
+              "help": "Timeout for each API request in seconds. Default: 120.",
+              "defaultValue": "120",
+              "validators": [
+                {
+                  "type": "number",
+                  "range": [
+                    10,
+                    3600
+                  ],
+                  "isInteger": true,
+                  "errorMsg": "Timeout must be an integer between 10 and 3600."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "meta": {
+    "name": "TA_unifi_ng",
+    "restRoot": "TA_unifi_ng",
+    "version": "3.3.0",
+    "displayName": "UniFi Network Add-on for Splunk",
+    "schemaVersion": "0.0.9",
+    "supportedThemes": [
+      "light",
+      "dark"
+    ],
+    "_uccVersion": "5.52.0"
+  }
+}

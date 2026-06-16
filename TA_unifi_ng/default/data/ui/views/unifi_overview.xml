@@ -1,0 +1,120 @@
+<form version="1.1" theme="dark">
+  <label>UniFi - Overview</label>
+  <description>High-level view of UniFi data collected by TA_unifi_ng. Set the index if you do not use the default.</description>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="text" token="idx" searchWhenChanged="true">
+      <label>Index</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="time" token="tr" searchWhenChanged="true">
+      <label>Time range</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <single>
+        <title>Sites</title>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:site | stats dc(unifi_site_id) as sites</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="colorBy">value</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Devices</title>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:device | stats dc(id) as devices</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Devices Offline</title>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:device | stats latest(state) as state by id | search state!="ONLINE" | stats count as offline</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0xdc4e41"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Connected Clients</title>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:client | stats dc(macAddress) as clients</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Networks</title>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:network | stats dc(id) as networks</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Events by sourcetype</title>
+      <chart>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:* | timechart span=10m count by sourcetype</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="height">300</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Devices by model</title>
+      <chart>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:device | dedup id | top limit=15 model</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.legend.placement">none</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Clients by connection type</title>
+      <chart>
+        <search>
+          <query>index=$idx$ sourcetype=unifi:client | dedup macAddress | stats count by type</query>
+          <earliest>$tr.earliest$</earliest>
+          <latest>$tr.latest$</latest>
+        </search>
+        <option name="charting.chart">pie</option>
+      </chart>
+    </panel>
+  </row>
+</form>
