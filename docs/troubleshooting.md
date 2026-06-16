@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
 Without it, splunkd execs the handler file, it defines the class/endpoint and exits with **empty stdout** → splunkd can't parse the (empty) XML response → the UI shows the `%s` placeholder error. The settings and unifi_ingest handlers had the block; the account handler did not.
 
-**Diagnosis path (Splunk 10.2.3 in Docker, container `8656761dc1eb`):**
+**Diagnosis path (Splunk 10.2.3 in Docker, container `<container>`):**
 ```bash
 # 1) Reproduce the 500 directly
 docker exec -u splunk <cid> /opt/splunk/bin/splunk _internal call \

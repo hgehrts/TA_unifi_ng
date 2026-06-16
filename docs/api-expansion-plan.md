@@ -417,7 +417,7 @@ Operation-ID → endpoint map (for doc links), key ones:
 
 ## 11. Status: complete
 
-All phases implemented. Latest artifact: **`~/Projekte/TA/TA_unifi_ng-3.3.0.tar.gz`**.
+All phases implemented. Latest artifact: **`dist/TA_unifi_ng-3.3.0.tar.gz`**.
 Release/install notes: **`08-release-notes.md`**.
 
 Possible future work (not planned/required):

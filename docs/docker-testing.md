@@ -1,8 +1,8 @@
 # Docker E2E test — Splunk + TA UniFi NG
 
 **Date:** 2026-06-04  
-**Lab directory:** `~/Projekte/TA/docker-splunk-unifi-test/`  
-**TA package:** `~/Projekte/TA/TA_unifi_ng-1.3.0.tar.gz` (source: `~/Projekte/TA/unifi-ta-ng/TA_unifi_ng/`)
+**Lab directory:** `docker-splunk/`  
+**TA package:** `TA_unifi_ng-<version>.tar.gz` (source: `unifi-ta-ng/TA_unifi_ng/`)
 
 ## Purpose
 
@@ -22,16 +22,16 @@ Validate the classic add-on **TA_unifi_ng** v1.3.0 inside **Splunk Enterprise in
 | Input stanza | **`[unifi_ingest://docker_test]`** only — never `[script://./bin/unifi_ingest.py]` |
 | Splunk CLI | Always **`-u splunk`** for `/opt/splunk/etc` and `/opt/splunk/var` |
 | Booleans in `.conf` | `0` / `1`, not `true` / `false` |
-| Restart | Prefer **`docker restart splunk-unifi-test`** over in-container `splunk restart` |
+| Restart | Prefer **`docker restart splunk`** over in-container `splunk restart` |
 | Validate script | **`splunk cmd python .../bin/unifi_ingest.py --scheme --validate-arguments`** (not bare `python3`) |
 | Reserved arg | Use **`controller_url`**, not `host` (Splunk internal argument) |
 
 ## 1. Start Splunk container
 
 ```bash
-cd ~/Projekte/TA/docker-splunk-unifi-test
+cd docker-splunk
 docker compose up -d
-docker ps --filter name=splunk-unifi-test
+docker ps --filter name=splunk
 ```
 
 Wait until healthcheck passes (Web UI on port 8000).
@@ -41,19 +41,19 @@ Wait until healthcheck passes (Web UI on port 8000).
 Copy artifacts into the container:
 
 ```bash
-docker cp ~/Projekte/TA/TA_unifi_ng-1.3.0.tar.gz splunk-unifi-test:/tmp/
-docker cp ~/Projekte/TA/docker-splunk-unifi-test/inputs.local.conf splunk-unifi-test:/tmp/inputs.local.conf
+docker cp TA_unifi_ng-<version>.tar.gz splunk:/tmp/
+docker cp docker-splunk/inputs.local.conf splunk:/tmp/inputs.local.conf
 ```
 
 Install inside the container (**do not use root**):
 
 ```bash
-docker exec -u splunk splunk-unifi-test bash -c '
+docker exec -u splunk splunk bash -c '
   set -e
   cd /opt/splunk/etc/apps
   rm -rf TA_unifi_ng
   mkdir -p TA_unifi_ng
-  tar -xzf /tmp/TA_unifi_ng-1.3.0.tar.gz -C TA_unifi_ng
+  tar -xzf /tmp/TA_unifi_ng-<version>.tar.gz -C TA_unifi_ng
   chmod +x TA_unifi_ng/bin/*.py
   mkdir -p TA_unifi_ng/local
   cp /tmp/inputs.local.conf TA_unifi_ng/local/inputs.conf
@@ -64,14 +64,14 @@ docker exec -u splunk splunk-unifi-test bash -c '
 Enable the app (optional but recommended):
 
 ```bash
-docker exec -u splunk splunk-unifi-test \
+docker exec -u splunk splunk \
   /opt/splunk/bin/splunk enable app TA_unifi_ng -auth admin:<SPLUNK_ADMIN_PASSWORD>
 ```
 
 Restart the container (preferred on Apple Silicon / lab images):
 
 ```bash
-docker restart splunk-unifi-test
+docker restart splunk
 # wait ~60–120 s for splunkd + first modular input run (interval=60)
 ```
 
@@ -80,7 +80,7 @@ docker restart splunk-unifi-test
 Scheme and arguments:
 
 ```bash
-docker exec -u splunk splunk-unifi-test \
+docker exec -u splunk splunk \
   /opt/splunk/bin/splunk cmd python \
   /opt/splunk/etc/apps/TA_unifi_ng/bin/unifi_ingest.py \
   --scheme --validate-arguments -auth admin:<SPLUNK_ADMIN_PASSWORD>
@@ -91,7 +91,7 @@ Expect XML scheme with `controller_url` (no `host`).
 Check **splunkd** (no `host` / init errors):
 
 ```bash
-docker exec -u splunk splunk-unifi-test bash -c \
+docker exec -u splunk splunk bash -c \
   'grep -E "ModularInputs.*unifi|Endpoint argument.*host|Unable to initialize.*unifi" \
    /opt/splunk/var/log/splunk/splunkd.log || echo "OK: no matching errors"'
 ```
@@ -106,7 +106,7 @@ New scheduled exec process: .../bin/unifi_ingest.py
 ## 4. Confirm indexing
 
 ```bash
-docker exec -u splunk splunk-unifi-test \
+docker exec -u splunk splunk \
   /opt/splunk/bin/splunk search 'index=unifi | stats count by sourcetype' \
   -auth admin:<SPLUNK_ADMIN_PASSWORD>
 ```
@@ -126,14 +126,14 @@ Per-cycle volume (single successful poll) is approximately **~90 events** (1 sit
 Recent-window check:
 
 ```bash
-docker exec -u splunk splunk-unifi-test \
+docker exec -u splunk splunk \
   /opt/splunk/bin/splunk search 'index=unifi earliest=-5m | stats count by sourcetype' \
   -auth admin:<SPLUNK_ADMIN_PASSWORD>
 ```
 
 ## 5. Lab input stanza template
 
-File: `docker-splunk-unifi-test/inputs.local.conf` (secrets stay local; do not commit API keys):
+File: `docker-splunk/inputs.local.conf` (secrets stay local; do not commit API keys):
 
 ```ini
 [unifi_ingest://docker_test]
@@ -161,7 +161,7 @@ disabled = 0
 | `splunk install app` fails | Manual `tar` extract to `/opt/splunk/etc/apps/TA_unifi_ng` as above |
 | `splunk enable app` “does not exist” | App on disk can still work; run `splunk enable app TA_unifi_ng` after extract |
 | Bare `python3` → `libssl.so.3` | Use **`splunk cmd python`** |
-| In-container `splunk restart` hangs | Use **`docker restart splunk-unifi-test`** |
+| In-container `splunk restart` hangs | Use **`docker restart splunk`** |
 | No events, 401 from controller | Rotate Integration API key; test with `curl -sk -H "X-API-KEY: ..." https://192.168.1.1/proxy/network/integration/v1/sites` |
 | Self-signed TLS | Set `verify_ssl = 0` in the input stanza |
 | Controller unreachable from container | Use host gateway IP or published URL; verify Docker network can reach controller :443 |
@@ -170,7 +170,7 @@ disabled = 0
 ## Reset lab (clean volumes)
 
 ```bash
-cd ~/Projekte/TA/docker-splunk-unifi-test
+cd docker-splunk
 docker compose down -v
 docker compose up -d
 # repeat install steps as splunk user only

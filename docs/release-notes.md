@@ -191,13 +191,14 @@ Device `state`: `ONLINE`, `OFFLINE`, `PENDING_ADOPTION`, `UPDATING`,
 
 ## Build / maintenance reference
 
-- Source tree: `~/Projekte/TA/unifi-ta-ng/` (`output/TA_unifi_ng/` is the shipped
-  layout; `package/` + `globalConfig.json` are the ucc-gen inputs).
-- Endpoint registry lives in `bin/unifi_ingest.py` (`INVENTORY_ENDPOINTS`,
-  `REFERENCE_ENDPOINTS`, telemetry collectors) — the single place to add new lists.
+- Repo layout: `TA_unifi_ng/` is the ready-to-install app (what ships);
+  `src/package/` + `src/globalConfig.json` are the ucc-gen inputs to regenerate it.
+- Endpoint registry lives in `TA_unifi_ng/bin/unifi_ingest.py`
+  (`INVENTORY_ENDPOINTS`, `REFERENCE_ENDPOINTS`, telemetry collectors) — the
+  single place to add new API lists.
 - Live OpenAPI spec snapshot: `_ref/integration-oas.json`. Re-pull on controller
   upgrades: `curl -sk -H "X-API-KEY: <key>" https://<controller>/proxy/network/api-docs/integration.json`
-- Rebuild: clean `__pycache__`/xattrs, then
-  `tar --no-mac-metadata -czf TA_unifi_ng-<ver>.tar.gz TA_unifi_ng`.
+- Rebuild the package: `./build.sh` (writes `dist/TA_unifi_ng-<ver>.tar.gz` + `.sha256`).
+- Regenerate the app from ucc-gen sources: see `src/README.md`.
 - Every persistent REST handler **must** end with the
   `if __name__ == "__main__": admin_external.handle(...)` block.
