@@ -21,7 +21,7 @@
         "id": {
             "group": null,
             "name": "TA_unifi_ng",
-            "version": "3.3.0"
+            "version": "3.3.1"
         },
         "license": {
             "name": "Apache-2.0",

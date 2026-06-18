@@ -37,6 +37,12 @@ index=<your_index> sourcetype=unifi:* | stats count by sourcetype
 
 See [`docs/release-notes.md`](docs/release-notes.md) for the full install/upgrade guide.
 
+> **Companion app:** a separate **UniFi App for Splunk** (`unifi_app_for_splunk`,
+> in its own repository) correlates this TA's data with UniFi syslog (via SC4S),
+> enriches cryptic device/client IDs to names/IP/MAC/vendor, and ships four
+> linked Dashboard Studio dashboards for problem identification and root-cause
+> analysis.
+
 ---
 
 ## Inputs
@@ -116,13 +122,13 @@ To regenerate with the Splunk UCC generator from the sources in
 - On every push/PR to `main`: builds the package with `build.sh`, validates it
   (single top-level dir, no junk/native binaries, Python compiles, checksum
   matches) and uploads it as a build artifact.
-- On a version tag `v*` (e.g. `v3.3.0`): builds and attaches the tarball +
+- On a version tag `v*` (e.g. `v3.3.1`): builds and attaches the tarball +
   `.sha256` to a GitHub Release, using `docs/release-notes.md` as the body.
 
 Cut a release:
 
 ```bash
-git tag v3.3.0 && git push origin v3.3.0
+git tag v3.3.1 && git push origin v3.3.1
 ```
 
 ---
