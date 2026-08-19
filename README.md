@@ -37,8 +37,8 @@ index=<your_index> sourcetype=unifi:* | stats count by sourcetype
 
 See [`docs/release-notes.md`](docs/release-notes.md) for the full install/upgrade guide.
 
-> **Companion app:** a separate **UniFi App for Splunk** (`unifi_app_for_splunk`,
-> in its own repository) correlates this TA's data with UniFi syslog (via SC4S),
+> **Companion app:** a separate [**UniFi App for Splunk**](https://github.com/hgehrts/unifi_app_for_splunk)
+> (`unifi_app_for_splunk`) correlates this TA's data with UniFi syslog (via SC4S),
 > enriches cryptic device/client IDs to names/IP/MAC/vendor, and ships four
 > linked Dashboard Studio dashboards for problem identification and root-cause
 > analysis.
