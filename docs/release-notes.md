@@ -1,10 +1,10 @@
 # TA_unifi_ng — Release & Distribution Notes
 
 **Add-on:** UniFi Network Add-on for Splunk (`TA_unifi_ng`)
-**Current release:** 3.3.0
-**Artifact:** `TA_unifi_ng-3.3.0.tar.gz`
-**SHA-256:** `9878f4066ebb310c09f83032447f69a40d89039291eb678ffa593050a88fbd21`
-**Tested on:** Splunk Enterprise 10.x (10.2.3 verified), Python 3.9
+**Current release:** 3.4.0
+**Artifact:** `TA_unifi_ng-3.4.0.tar.gz`
+**SHA-256:** `f88e13f1fe6dd7514914834b2af918a0694c811512b82eab8e0b8d02e5453ade`
+**Tested on:** Splunk Enterprise 10.x (10.2.3 verified), Python 3
 **Controller API:** UniFi Network Integration API v1 (verified against 10.4.57)
 
 ---

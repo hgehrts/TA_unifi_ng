@@ -109,7 +109,7 @@ The ready-to-install app is committed under [`TA_unifi_ng/`](TA_unifi_ng/).
 
 ```bash
 ./build.sh            # -> dist/TA_unifi_ng-<VERSION>.tar.gz (+ .sha256)
-./build.sh 3.3.1      # override version label
+./build.sh 3.4.0      # override version label
 ```
 
 To regenerate with the Splunk UCC generator from the sources in
@@ -122,13 +122,13 @@ To regenerate with the Splunk UCC generator from the sources in
 - On every push/PR to `main`: builds the package with `build.sh`, validates it
   (single top-level dir, no junk/native binaries, Python compiles, checksum
   matches) and uploads it as a build artifact.
-- On a version tag `v*` (e.g. `v3.3.1`): builds and attaches the tarball +
+- On a version tag `v*` (e.g. `v3.4.0`): builds and attaches the tarball +
   `.sha256` to a GitHub Release, using `docs/release-notes.md` as the body.
 
 Cut a release:
 
 ```bash
-git tag v3.3.1 && git push origin v3.3.1
+git tag v3.4.0 && git push origin v3.4.0
 ```
 
 ---

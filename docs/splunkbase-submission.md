@@ -11,7 +11,7 @@ Use this as a copy-paste guide when submitting at [Splunkbase Developer Portal](
 | **App / package name** | UniFi Network Add-on for Splunk |
 | **Package ID** | `TA_unifi_ng` |
 | **Type** | Add-on |
-| **Version** | 3.3.1 |
+| **Version** | 3.4.0 |
 | **License** | Apache-2.0 |
 | **Support model** | Developer Supported |
 | **Author / Created by** | Hans-Henning Gehrts |
@@ -25,7 +25,7 @@ Use this as a copy-paste guide when submitting at [Splunkbase Developer Portal](
 
 Download from GitHub Release (do not upload from `local/`):
 
-- https://github.com/hgehrts/TA_unifi_ng/releases/download/v3.3.1/TA_unifi_ng-3.3.1.tar.gz
+- https://github.com/hgehrts/TA_unifi_ng/releases/download/v3.4.0/TA_unifi_ng-3.4.0.tar.gz
 
 ## Icons (upload in listing editor)
 
@@ -40,9 +40,9 @@ Download from GitHub Release (do not upload from `local/`):
 Run before upload and attach the HTML/JSON report to the submission (or paste summary in notes):
 
 ```bash
-splunk-appinspect inspect dist/TA_unifi_ng-3.3.1.tar.gz \
-  --included-tags cloud,private --mode precert \
-  --output-file docs/appinspect-v3.3.1.json
+splunk-appinspect inspect dist/TA_unifi_ng-3.4.0.tar.gz \
+  --included-tags cloud --included-tags private_app --mode precert \
+  --output-file docs/appinspect-v3.4.0.json
 ```
 
 **Requirement:** 0 errors, 0 failures (warnings may need explanation).

@@ -1,5 +1,14 @@
 # Changelog — UniFi Network Add-on for Splunk (TA_unifi_ng)
 
+## 3.4.0
+- Splunkbase/SLIM-compatible `app.manifest` (removed UCC-only fields `info.port`
+  and `info.tags`; aligned remaining keys with the Packaging Toolkit schema).
+- Ship Apache-2.0 `LICENSE` inside the app package.
+- Declare `python.required = 3.13` on modular inputs and REST handlers.
+
+## 3.3.1
+- App icons and packaging/CI for public GitHub releases.
+
 ## 3.3.0
 - CIM compliance: field aliases / calculated fields for the Inventory,
   Network Sessions and Performance data models; `eventtypes.conf` + `tags.conf`.
