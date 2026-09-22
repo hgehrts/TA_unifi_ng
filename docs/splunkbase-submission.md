@@ -15,7 +15,7 @@ Use this as a copy-paste guide when submitting at [Splunkbase Developer Portal](
 | **License** | Apache-2.0 |
 | **Support model** | Developer Supported |
 | **Author / Created by** | Hans-Henning Gehrts |
-| **Contact email** | hgehrts@splunk.com |
+| **Contact email** | hgehrts@gmail.com |
 | **Source code URL** | https://github.com/hgehrts/TA_unifi_ng |
 | **Categories** | Network, IT Operations |
 | **Splunk compatibility** | Enterprise 8.0+, 9.x, 10.x (tested on 10.2.3) |

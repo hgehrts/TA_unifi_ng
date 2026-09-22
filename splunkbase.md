@@ -173,4 +173,4 @@ Follow your Cloud admin's process for modular inputs on heavy forwarders vs. sea
 
 - **Documentation:** https://github.com/hgehrts/TA_unifi_ng/blob/main/README.md
 - **Issues:** https://github.com/hgehrts/TA_unifi_ng/issues
-- **Contact:** hgehrts@splunk.com (or open a GitHub issue)
+- **Contact:** hgehrts@gmail.com (or open a GitHub issue)
