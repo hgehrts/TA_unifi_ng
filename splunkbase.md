@@ -7,6 +7,37 @@ Copy the sections below into the Splunkbase add-on listing fields (Short Descrip
 
 ---
 
+## Splunkbase form answers
+
+Use these values on the Splunkbase listing form.
+
+### CIM Model Version
+
+Tick **4.x, 5.x, 6.x, 7.x, 8.x**. Do **not** tick **3.x**.
+
+The add-on maps:
+
+| Sourcetype(s) | CIM data model |
+|---|---|
+| `unifi:device`, `unifi:device:detail`, `unifi:network`, `unifi:network:detail` | Inventory |
+| `unifi:client` | Network Sessions |
+| `unifi:device:stats` | Performance |
+
+Those models and tags (`inventory`/`network`, `network`/`session`, `performance`)
+have been stable since CIM 4.x through CIM 8.6. CIM 3.x was never validated.
+
+### Splunk Enterprise compatibility
+
+Tick every **9.x and 10.x** version the form offers, at least:
+
+**9.0, 9.1, 9.2, 9.3, 9.4, 10.0, 10.1, 10.2, 10.3, 10.4, 10.5**
+
+The package is built for Python 3 (`python.required = 3.13` on modular inputs /
+REST handlers, as required from Splunk 10.2 onward). Tested on Splunk Enterprise
+**10.2.3**. Splunk Cloud (Victoria) expected compatible after AppInspect.
+
+---
+
 ## Short Description
 
 Read-only Splunk add-on that polls the UniFi Network Integration API v1 and indexes inventory, configuration, per-device telemetry and reference data into Splunk. 25 sourcetypes, CIM-mapped, cadence-grouped inputs.
@@ -69,10 +100,11 @@ The add-on does not phone home and includes no product analytics. It issues **re
 
 ### Compatibility
 
-| Platform | Minimum version |
+| Platform | Versions to select on Splunkbase |
 |---|---|
-| Splunk Enterprise | 8.0+ (manifest); tested on 10.x |
-| Splunk Cloud (Victoria) | Expected to work; validate with AppInspect and your Cloud vetting process |
+| Splunk Enterprise | **9.0 – 10.5** (tested on 10.2.3) |
+| Splunk Cloud (Victoria) | Expected compatible after AppInspect / Cloud vetting |
+| CIM | **4.x, 5.x, 6.x, 7.x, 8.x** (Inventory, Network Sessions, Performance). Not 3.x. |
 
 Requires a UniFi Network controller with the **Integration API** enabled and an API key (Settings → Control Plane → Integrations). Verified against UniFi Network **10.4.57**.
 

@@ -18,7 +18,7 @@ Use this as a copy-paste guide when submitting at [Splunkbase Developer Portal](
 | **Contact email** | hgehrts@gmail.com |
 | **Source code URL** | https://github.com/hgehrts/TA_unifi_ng |
 | **Categories** | Network, IT Operations |
-| **Splunk compatibility** | Enterprise 8.0+, 9.x, 10.x (tested on 10.2.3) |
+| **Splunk compatibility** | **9.0–10.5** (tested on 10.2.3); CIM **4.x–8.x** |
 | **Splunk Cloud** | Expected compatible — submit AppInspect cloud report |
 
 ## Package to upload
